@@ -12,3 +12,4 @@ dependencies:
   - praw
   - pandas
   - python-dotenv
+  - lxml
