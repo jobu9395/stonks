@@ -1,0 +1,12 @@
+name: stonks
+channels:
+  - conda-forge
+  - nvidia
+  - pytorch
+dependencies:
+  - numpy
+  - pyyaml
+  - matplotlib
+  - pytorch
+  - cudatoolkit
+

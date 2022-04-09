@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5e5727f3-578d-431a-8924-cd237e4de9ea" name="Default Changelist" comment="" />
+    <list default="true" id="5e5727f3-578d-431a-8924-cd237e4de9ea" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="27ZaC9gWZbXFwdxJtvtXCmmvTj9" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -16,7 +31,16 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\jburd\Desktop\deep-learning\stonks" />
+    </key>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="showServicesTree" value="false" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -28,7 +52,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1649529931985</updated>
-      <workItem from="1649529933159" duration="35000" />
+      <workItem from="1649529933159" duration="2866000" />
     </task>
     <servers />
   </component>
@@ -36,13 +60,13 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="1044" y="503" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1649530018018">
+    <state x="1044" y="503" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1649531049311">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="1044" y="503" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1400/-1920.160.1920.1040@0.0.2560.1400" timestamp="1649530018018" />
-    <state x="781" y="342" key="SettingsEditor" timestamp="1649529967152">
+    <state x="1044" y="503" key="#com.intellij.fileTypes.FileTypeChooser/0.0.2560.1400/-1920.160.1920.1040@0.0.2560.1400" timestamp="1649531049311" />
+    <state x="781" y="342" key="SettingsEditor" timestamp="1649531119154">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="781" y="342" key="SettingsEditor/0.0.2560.1400/-1920.160.1920.1040@0.0.2560.1400" timestamp="1649529967152" />
+    <state x="781" y="342" key="SettingsEditor/0.0.2560.1400/-1920.160.1920.1040@0.0.2560.1400" timestamp="1649531119154" />
   </component>
 </project>
