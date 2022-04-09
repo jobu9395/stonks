@@ -2,6 +2,18 @@ import praw
 import os
 from dotenv import load_dotenv
 
+class Subreddit:
+    """Connect to a specific subreddit"""
+    def __init__(self, time_frame, name):
+        self.time_frame = time_frame
+        self.name = name
+        self.reddit = connect()
+
+    # sets up reddit client
+    def connect_subreddit(self):
+        subreddit = self.reddit.subreddit(self.name)
+        return subreddit
+
 def connect():
     """Connect to reddit"""
 
