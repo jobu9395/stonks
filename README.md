@@ -1,6 +1,5 @@
 # stonks
  
- 
  install env
  ```shell script
 conda env create -f environment.yaml

@@ -9,4 +9,5 @@ dependencies:
   - matplotlib
   - pytorch
   - cudatoolkit
-
+  - praw
+  - pandas
