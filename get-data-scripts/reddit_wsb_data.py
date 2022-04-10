@@ -1,32 +1,38 @@
-import os
-import praw
+# https://trello.com/c/wXZXOQrL/2-praw-api-for-getting-custom-dataset
 import pandas as pd
-from reddit import connect, Subreddit
+import reddit_client
+import datetime as dt
+
+SUBREDDIT = reddit_client.connect("wallstreetbets")
+STOCKS = ["GME", "AMC", "PLTR", "CRSR", "VOO", "IRNT", "RIOT"]
 
 
-def get_s_and_b_data():
-    # sets up
+# sets up
+def scrape_wikipedia_for_sp_500():
     payload = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-    print(payload)
-    first_table = payload[0]
-    second_table = payload[1]
-    df = first_table
+    df = payload[0]
     ordered_list_of_tickers = df[df.columns[0]]
-    string_list_of_tickers = []
-    for element in ordered_list_of_tickers:
-        string_list_of_tickers.append('' + element + '')
+    ordered_list_of_tickers.to_csv('dataset/ticker_list.csv')
 
 
-    # print(string_list_of_tickers)
-    ordered_list_of_tickers.to_csv('./datasets/ticker_list.csv', index=False)
+def get_post_statistics():
+    submission_statistics = []
+    for ticker in STOCKS:
+        for submission in SUBREDDIT.search(ticker, limit=10):
+            d = {}
+            d['ticker'] = ticker
+            d['num_comments'] = submission.num_comments
+            d['score'] = submission.score
+            d['upvote_ratio'] = submission.upvote_ratio
+            d['date'] = dt.datetime.fromtimestamp(submission.created_utc)
+            d['domain'] = submission.domain
+            d['num_crossposts'] = submission.num_crossposts
+            d['author'] = submission.author
+            submission_statistics.append(d)
 
-def get_wsb_data():
-    ''' Comments, '''
-    pass
+    submission_statistics_df = pd.DataFrame(submission_statistics)
+    submission_statistics_df.to_csv('dataset/test_pltr.csv')
 
-def ticker_list():
-    return string_list_of_tickers
 
-subreddit = Subreddit(time_frame=0, name="investing")
-connection = subreddit.connect_subreddit()
-print(connection)
+if __name__ == "__main__":
+    get_post_statistics()
