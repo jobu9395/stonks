@@ -26,28 +26,30 @@ def get_post_statistics():
     submission_statistics = []
     comment_list = []
     for ticker in STOCKS:
-        for submission in SUBREDDIT.search(ticker, limit=100):
-            d = {}
-            d['ticker'] = ticker
-            d['num_comments'] = submission.num_comments
-            d['score'] = submission.score
-            d['upvote_ratio'] = submission.upvote_ratio
-            d['date'] = dt.datetime.fromtimestamp(submission.created_utc)
-            d['domain'] = submission.domain
-            d['num_crossposts'] = submission.num_crossposts
-            d['author'] = submission.author
-            submission_statistics.append(d)
+        for submission in SUBREDDIT.search(ticker, limit=500):
+            dict_post = {}
+            dict_post['ticker'] = ticker
+            dict_post['post_id'] = submission.id
+            dict_post['date'] = dt.datetime.fromtimestamp(submission.created_utc)
+            dict_post['title'] = submission.title
+            dict_post['post_name'] = submission.name
+            dict_post['score'] = submission.score
+            dict_post['upvote_ratio'] = submission.upvote_ratio
+            dict_post['num_comments'] = submission.num_comments
+            dict_post['distiniguished_post'] = submission.distinguished
+            submission_statistics.append(dict_post)
 
             comments = submission.comments.list()
             for comment in comments:
                 if isinstance(comment, MoreComments):
                     continue
-                d_comment = {}
-                d_comment['comment_ticker'] = ticker
-                d_comment['comment_id'] = comment
-                d_comment['comment_body'] = comment.body
-                d_comment['date'] = dt.datetime.fromtimestamp(comment.created_utc)
-                comment_list.append(d_comment)
+                dict_comment = {}
+                dict_comment['comment_ticker'] = ticker
+                dict_comment['comment_id'] = comment
+                dict_comment['date'] = dt.datetime.fromtimestamp(comment.created_utc)
+                dict_comment['comment_body'] = comment.body
+                dict_comment['distinguished_comment'] = comment.distinguished
+                comment_list.append(dict_comment)
 
     submission_statistics_df = pd.DataFrame(submission_statistics)
     submission_statistics_df.sort_values(by='date')
