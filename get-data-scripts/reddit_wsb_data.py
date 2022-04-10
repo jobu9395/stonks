@@ -2,9 +2,16 @@
 import pandas as pd
 import reddit_client
 import datetime as dt
+from praw.models import MoreComments
 
 SUBREDDIT = reddit_client.connect("wallstreetbets")
-STOCKS = ["GME", "AMC", "PLTR", "CRSR", "VOO", "IRNT", "RIOT"]
+STOCKS = [
+    "GME",
+    "AMC",
+    "PLTR",
+    "CRSR",
+    "VOO",
+]
 
 
 # sets up
@@ -17,8 +24,9 @@ def scrape_wikipedia_for_sp_500():
 
 def get_post_statistics():
     submission_statistics = []
+    comment_list = []
     for ticker in STOCKS:
-        for submission in SUBREDDIT.search(ticker, limit=10):
+        for submission in SUBREDDIT.search(ticker, limit=100):
             d = {}
             d['ticker'] = ticker
             d['num_comments'] = submission.num_comments
@@ -30,8 +38,24 @@ def get_post_statistics():
             d['author'] = submission.author
             submission_statistics.append(d)
 
+            comments = submission.comments.list()
+            for comment in comments:
+                if isinstance(comment, MoreComments):
+                    continue
+                d_comment = {}
+                d_comment['comment_ticker'] = ticker
+                d_comment['comment_id'] = comment
+                d_comment['comment_body'] = comment.body
+                d_comment['date'] = dt.datetime.fromtimestamp(comment.created_utc)
+                comment_list.append(d_comment)
+
     submission_statistics_df = pd.DataFrame(submission_statistics)
-    submission_statistics_df.to_csv('dataset/test_pltr.csv')
+    submission_statistics_df.sort_values(by='date')
+    submission_statistics_df.to_csv('dataset/posts.csv')
+
+    comments_df = pd.DataFrame(comment_list)
+    comments_df.sort_values(by='date')
+    comments_df.to_csv('dataset/comments.csv')
 
 
 if __name__ == "__main__":
