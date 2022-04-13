@@ -12,9 +12,9 @@ STOCKS = [
     "CRSR",
     "VOO",
 ]
-AMOUNT = 100
+AMOUNT = 500
 
-# sets up
+
 def scrape_wikipedia_for_sp_500():
     payload = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
     df = payload[0]
@@ -38,7 +38,8 @@ def get_post_statistics(subreddit: str) -> None:
             dict_post['upvote_ratio'] = submission.upvote_ratio
             dict_post['num_comments'] = submission.num_comments
             dict_post['distiniguished_post'] = submission.distinguished
-            submission_statistics.append(dict_post)
+            if dict_post['date'] > dt.datetime(2017, 4, 1):
+                submission_statistics.append(dict_post)
 
             comments = submission.comments.list()
             for comment in comments:
@@ -60,4 +61,3 @@ def get_post_statistics(subreddit: str) -> None:
     comments_df = pd.DataFrame(comment_list)
     comments_df.sort_values(by='date')
     comments_df.to_csv(f'dataset/{subreddit}-comments.csv')
-
