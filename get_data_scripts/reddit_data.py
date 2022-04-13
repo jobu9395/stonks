@@ -5,7 +5,6 @@ from get_data_scripts import reddit_client
 from praw.models import MoreComments
 from scripts import data_clean
 
-SUBREDDIT = reddit_client.connect("wallstreetbets")
 STOCKS = [
     "GME",
     "AMC",
@@ -23,11 +22,12 @@ def scrape_wikipedia_for_sp_500():
     ordered_list_of_tickers.to_csv('dataset/ticker_list.csv')
 
 
-def get_post_statistics():
+def get_post_statistics(subreddit: str) -> None:
+    sub = reddit_client.connect(subreddit)
     submission_statistics = []
     comment_list = []
     for ticker in STOCKS:
-        for submission in SUBREDDIT.search(ticker, limit=AMOUNT):
+        for submission in sub.search(ticker, limit=AMOUNT):
             dict_post = {}
             dict_post['ticker'] = ticker
             dict_post['post_id'] = submission.id
@@ -55,9 +55,9 @@ def get_post_statistics():
 
     submission_statistics_df = pd.DataFrame(submission_statistics)
     submission_statistics_df.sort_values(by='date')
-    submission_statistics_df.to_csv('dataset/posts.csv')
+    submission_statistics_df.to_csv(f'dataset/{subreddit}-posts.csv')
 
     comments_df = pd.DataFrame(comment_list)
     comments_df.sort_values(by='date')
-    comments_df.to_csv('dataset/comments.csv')
+    comments_df.to_csv(f'dataset/{subreddit}-comments.csv')
 

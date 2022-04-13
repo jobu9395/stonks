@@ -1,7 +1,6 @@
 import nltk
 nltk.download("stopwords")
 
-from calendar import c
 from string import punctuation
 from typing import List
 from nltk.corpus import stopwords
