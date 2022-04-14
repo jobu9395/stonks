@@ -7,12 +7,9 @@ from scripts import data_clean
 
 STOCKS = [
     "GME",
-    "AMC",
-    "PLTR",
-    "CRSR",
-    "VOO",
+    "AMC"
 ]
-AMOUNT = 500
+AMOUNT = 10
 
 
 def scrape_wikipedia_for_sp_500():
@@ -37,20 +34,23 @@ def get_post_statistics(subreddit: str) -> None:
             dict_post['score'] = submission.score
             dict_post['upvote_ratio'] = submission.upvote_ratio
             dict_post['num_comments'] = submission.num_comments
-            dict_post['distiniguished_post'] = submission.distinguished
             if dict_post['date'] > dt.datetime(2017, 4, 1):
                 submission_statistics.append(dict_post)
 
             comments = submission.comments.list()
+            comment_set = set()
             for comment in comments:
                 if isinstance(comment, MoreComments):
                     continue
-                dict_comment = {}
-                dict_comment['comment_ticker'] = ticker
-                dict_comment['comment_id'] = comment
-                dict_comment['date'] = dt.datetime.fromtimestamp(comment.created_utc)
-                dict_comment['comment_body'] = data_clean.clean(comment.body)
-                dict_comment['distinguished_comment'] = comment.distinguished
+                body = data_clean.clean(comment.body)
+                if body and comment not in comment_set:
+                    comment_set.add(comment)
+                    dict_comment = {}
+                    dict_comment['comment_ticker'] = ticker
+                    dict_comment['comment_id'] = comment
+                    dict_comment['date'] = dt.datetime.fromtimestamp(comment.created_utc)
+                    dict_comment['comment_body'] = body
+
                 comment_list.append(dict_comment)
 
 
