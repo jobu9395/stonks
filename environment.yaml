@@ -7,7 +7,6 @@ dependencies:
   - numpy
   - pyyaml
   - matplotlib
-  - pytorch
   - cudatoolkit
   - praw
   - pandas
@@ -16,3 +15,7 @@ dependencies:
   - nltk
   - alive-progress
   - yfinance
+  - tensorflow
+  - pip:
+      - sklearn
+
