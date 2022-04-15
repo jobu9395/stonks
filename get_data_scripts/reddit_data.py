@@ -53,7 +53,6 @@ def get_post_statistics(subreddit: str) -> None:
                 dict_comment['distinguished_comment'] = comment.distinguished
                 comment_list.append(dict_comment)
 
-
     submission_statistics_df = pd.DataFrame(submission_statistics)
     submission_statistics_df.sort_values(by='date')
     submission_statistics_df.to_csv(f'dataset/{subreddit}-posts.csv')
