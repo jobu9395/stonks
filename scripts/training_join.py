@@ -14,7 +14,7 @@ def join_yfinance_with_reddit_comments():
     # drops all price data except for AMC's, drops the "Date" column and keeps the "date" columns to enable proper join
     price_df = pd.read_csv('dataset/daily_stock_prices.csv')
     price_df['date'] = pd.to_datetime(price_df['Date']).dt.date
-    price_df = price_df.drop(['Date', 'GME', 'PLTR', 'CRSR', 'VOO'], axis=1)
+    price_df = price_df.drop(['Date', 'GME'], axis=1)
 
     # left join to include non trading day's comments
     training_df = comments_df.merge(
@@ -29,7 +29,7 @@ def join_yfinance_with_reddit_comments():
     training_df = training_df.fillna(method='bfill')
 
     # further cleaning, uses date as index column
-    training_df = training_df.drop(['comment_ticker', 'comment_id', 'distinguished_comment'], axis=1)
+    training_df = training_df.drop(['comment_ticker', 'comment_id'], axis=1)
     training_df = training_df[['date', 'comment_body', 'AMC']]
     training_df['price'] = training_df['AMC']
     training_df = training_df.drop('AMC', axis=1)

@@ -26,6 +26,6 @@ Once you have activated your conda virtual environment on your machine, at the p
 python main.py
 ```
 
-This can potentially take a long time to run (and will depend on the global vars, `STOCKS` abd 'AMOUNT' in `reddit_data.py`.  
+This can potentially take a long time to run (and will depend on the global vars, `STOCKS` and `AMOUNT` in `reddit_data.py`.  
 
 Now, you should have a `training_data.csv` with cleaned data ready to be used by an RNN or LSTM deep learning model for stock predictions.

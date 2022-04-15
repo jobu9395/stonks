@@ -2,5 +2,5 @@
 *.env
 *.pyc
 dataset/
-*.idea
+idea/
 *.csv
