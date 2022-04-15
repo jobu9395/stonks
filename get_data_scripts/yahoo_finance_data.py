@@ -19,3 +19,5 @@ data = yf.download(
 
 adjusted_daily_closes = data['Adj Close'][STOCKS]
 adjusted_daily_closes.to_csv('dataset/daily_stock_prices.csv')
+
+print(adjusted_daily_closes)
