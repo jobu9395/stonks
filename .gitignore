@@ -1,6 +1,8 @@
+dataset/
+idea/
+*.idea
+*.iml
+*.csv
 *.xml
 *.env
 *.pyc
-dataset/
-idea/
-*.csv
