@@ -44,36 +44,36 @@ def train_model():
 
     X_train, y_train = np.array(X_train), np.array(y_train)
 
-    ###################################
+    # building custom model
     regressor = Sequential(
         [
-        LSTM(
-            units=50,
-            activation='relu',
-            return_sequences=True,
-            input_shape=(X_train.shape[1], X_train.shape[2])
-        ),
-        Dropout(0.1),
-        LSTM(
-            units=60,
-            activation='relu',
-            return_sequences=True,
-        ),
-        Dropout(0.1),
-        LSTM(
-            units=80,
-            activation='relu',
-            return_sequences=True,
-        ),
-        Dropout(0.1),
-        LSTM(
-            units=120,
-            activation='relu',
-        ),
-        Dropout(0.1),
-        Dense(
-            units=1
-        )
+            LSTM(
+                units=50,
+                activation='relu',
+                return_sequences=True,
+                input_shape=(X_train.shape[1], X_train.shape[2])
+            ),
+            Dropout(0.1),
+            LSTM(
+                units=60,
+                activation='relu',
+                return_sequences=True,
+            ),
+            Dropout(0.1),
+            LSTM(
+                units=80,
+                activation='relu',
+                return_sequences=True,
+            ),
+            Dropout(0.1),
+            LSTM(
+                units=120,
+                activation='relu',
+            ),
+            Dropout(0.1),
+            Dense(
+                units=1
+            )
         ]
     )
 
@@ -81,7 +81,7 @@ def train_model():
 
     regressor.compile(
         optimizer='adam',
-        loss='mean_squared_error'
+        loss='mean_squared_error',
     )
 
     regressor.fit(
