@@ -1,12 +1,8 @@
-
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-
-import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Dropout
-
 import matplotlib.pyplot as plt
 
 '''This models past numeric only data related to price using an RNN.'''
@@ -15,6 +11,7 @@ import matplotlib.pyplot as plt
 LAGGING_DAYS_FOR_TRAINING_DATA = 15
 TRAINING_DATA_FILE = 'dataset/daily_stock_prices_all_numbers.csv'
 EPOCH_COUNT = 50
+TRAIN_SPLIT_DATE_STRING = '2022-03-01'
 
 
 def train_model():
@@ -23,8 +20,8 @@ def train_model():
         date_parser=True
     )
 
-    data_training = df[df['Date'] < '2022-03-01'].copy()
-    data_test = df[df['Date'] >= '2022-03-01'].copy()
+    data_training = df[df['Date'] < TRAIN_SPLIT_DATE_STRING].copy()
+    data_test = df[df['Date'] >= TRAIN_SPLIT_DATE_STRING].copy()
 
     training_data = data_training.drop(['Date', 'Adj Close'], axis=1)
     test_data = data_test.drop(['Date'], axis=1)
@@ -45,8 +42,6 @@ def train_model():
         y_train.append(training_data[i, 0])
 
     X_train, y_train = np.array(X_train), np.array(y_train)
-
-    print(X_train.shape, y_train.shape)
 
     regressor = Sequential()
 
@@ -105,16 +100,12 @@ def train_model():
         batch_size=32
     )
 
-    # TODO prepare test dataset
-
     past_training_days = data_training.tail(LAGGING_DAYS_FOR_TRAINING_DATA)
     df = past_training_days.append(data_test, ignore_index=True)
-    print(df)
 
     df = df.drop(['Date', 'Adj Close'], axis=1)
 
     inputs = scaler.transform(df)
-    print(inputs)
 
     X_test = []
     y_test = []
@@ -124,7 +115,6 @@ def train_model():
         y_test.append(inputs[i, 0])
 
     X_test, y_test = np.array(X_test), np.array(y_test)
-    print(X_test.shape, y_test.shape)
 
     # normalize
     y_pred = regressor.predict(X_test)
