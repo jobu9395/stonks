@@ -8,10 +8,11 @@ import matplotlib.pyplot as plt
 '''This models past numeric only data related to price using an RNN.'''
 
 # global vars
-LAGGING_DAYS_FOR_TRAINING_DATA = 15
 TRAINING_DATA_FILE = 'dataset/daily_stock_prices_all_numbers.csv'
-EPOCH_COUNT = 50
 TRAIN_SPLIT_DATE_STRING = '2022-03-01'
+LAGGING_DAYS_FOR_TRAINING_DATA = 15
+BATCH_SIZE = 32
+EPOCH_COUNT = 100
 
 
 def train_model():
@@ -43,47 +44,37 @@ def train_model():
 
     X_train, y_train = np.array(X_train), np.array(y_train)
 
-    regressor = Sequential()
-
-    regressor.add(
+    ###################################
+    regressor = Sequential(
+        [
         LSTM(
             units=50,
             activation='relu',
             return_sequences=True,
-            input_shape=(X_train.shape[1], X_train.shape[2]),
-        )
-    )
-
-    regressor.add(Dropout(0.1))
-
-    regressor.add(
+            input_shape=(X_train.shape[1], X_train.shape[2])
+        ),
+        Dropout(0.1),
         LSTM(
             units=60,
             activation='relu',
             return_sequences=True,
-        )
-    )
-    regressor.add(Dropout(0.1))
-
-    regressor.add(
+        ),
+        Dropout(0.1),
         LSTM(
             units=80,
             activation='relu',
             return_sequences=True,
-        )
-    )
-    regressor.add(Dropout(0.1))
-
-    regressor.add(
+        ),
+        Dropout(0.1),
         LSTM(
             units=120,
             activation='relu',
+        ),
+        Dropout(0.1),
+        Dense(
+            units=1
         )
-    )
-    regressor.add(Dropout(0.1))
-
-    regressor.add(
-        Dense(units=1)
+        ]
     )
 
     print(regressor.summary())
@@ -97,14 +88,13 @@ def train_model():
         X_train,
         y_train,
         epochs=EPOCH_COUNT,
-        batch_size=32
+        batch_size=BATCH_SIZE,
     )
 
     past_training_days = data_training.tail(LAGGING_DAYS_FOR_TRAINING_DATA)
     df = past_training_days.append(data_test, ignore_index=True)
 
     df = df.drop(['Date', 'Adj Close'], axis=1)
-
     inputs = scaler.transform(df)
 
     X_test = []
