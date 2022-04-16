@@ -10,11 +10,11 @@ import datetime as dt
 '''This models past numeric only data related to price using an RNN.'''
 
 # global vars
-TRAINING_DATA_FILE = 'dataset/daily_stock_price_data.csv'
+TRAINING_DATA_FILE = 'dataset/training_data.csv'
 TRAIN_SPLIT_DATE_STRING = '2022-03-01'
 LAGGING_DAYS_FOR_TRAINING_DATA = 10
 BATCH_SIZE = 32
-EPOCH_COUNT = 5
+EPOCH_COUNT = 100
 
 
 def train_model():

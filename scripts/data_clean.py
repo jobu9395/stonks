@@ -16,7 +16,7 @@ def clean(sentence: str) -> List[str]:
     # remove emojois
     demojied = remove_emojis(sentence)
     words = demojied.translate(str.maketrans('', '', punctuation)).split(' ')
-    return [w.lower() for w in words if w.lower() not in STOPWORDS and len(w.lower()) < WORD_LENGTH]
+    return " ".join([w.lower() for w in words if w.lower() not in STOPWORDS and len(w.lower()) < WORD_LENGTH])
 
 def remove_emojis(data):
     emoj = re.compile("["

@@ -9,6 +9,7 @@ STOCKS = ['AMC']
 
 
 def main():
+    get_post_statistics("wallstreetbets")
     get_daily_stock_prices(STOCKS)
     print(f"scraped stock data for: {STOCKS}, training model")
     train_model()
