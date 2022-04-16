@@ -3,23 +3,27 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
+import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Dropout
+
+import matplotlib.pyplot as plt
 
 
 '''This models past numeric only data related to price using an RNN.'''
 
-# df = pd.read_csv('dataset/training_data.csv')
+LAGGING_DAYS_FOR_TRAINING_DATA = 30
+
 df = pd.read_csv(
     'dataset/daily_stock_prices_all_numbers.csv',
     date_parser=True
 )
 
-training_data = df[df['Date'] < '2022-03-01'].copy()
-test_data = df[df['Date'] >= '2022-03-01'].copy()
+data_training = df[df['Date'] < '2022-03-01'].copy()
+data_test = df[df['Date'] >= '2022-03-01'].copy()
 
-training_data = training_data.drop(['Date', 'Adj Close'], axis=1)
-test_data = test_data.drop(['Date'], axis=1)
+training_data = data_training.drop(['Date', 'Adj Close'], axis=1)
+test_data = data_test.drop(['Date'], axis=1)
 
 print(f"training data head: \n {training_data.head()}\n")
 print(f"test data head: \n {test_data.head()}\n")
@@ -102,3 +106,43 @@ regressor.fit(
 
 # TODO prepare test dataset
 # timestamp 34:04 on YT tutorial
+
+past_60_days = data_training.tail(60)
+df = past_60_days.append(data_test, ignore_index=True)
+print(df)
+
+df = df.drop(['Date', 'Adj Close'], axis=1)
+
+inputs = scaler.transform(df)
+print(inputs)
+
+X_test = []
+y_test = []
+
+for i in range(60, inputs.shape[0]):
+    X_test.append(inputs[i-60:i])
+    y_test.append(inputs[i, 0])
+
+X_test, y_test = np.array(X_test), np.array(y_test)
+print(X_test.shape, y_test.shape)
+
+# normalize
+y_pred = regressor.predict(X_test)
+scale = 1 / (scaler.scale_[0])
+
+y_pred = y_pred * scale
+y_test = y_test * scale
+
+"""Visualization"""
+
+plt.figure(figsize=(14, 5))
+plt.plot(y_test, color='red', label='Real AMC Stock Price')
+plt.plot(y_pred, color='blue', label='Predicted AMC Stock Price')
+plt.title('AMC Stock Price Prediction using LSTM neural network')
+plt.xlabel('Time')
+plt.ylabel('AMC Stock Price')
+plt.legend()
+plt.show()
+
+
+

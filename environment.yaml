@@ -16,6 +16,7 @@ dependencies:
   - alive-progress
   - yfinance
   - tensorflow
+  - tensorflow-gpu
   - pip:
       - sklearn
 
