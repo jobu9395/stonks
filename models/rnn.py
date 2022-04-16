@@ -123,14 +123,6 @@ def train_model():
     plt.title('AMC Stock Price Prediction using LSTM neural network')
     plt.xlabel('Time')
     plt.ylabel('AMC Stock Price')
-
-    x = [dt.datetime.strptime(d, '%m/%d/%Y').date() for d in y_test['dates']]
-
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
-    plt.gca().xaxis.set_major_locator(mdates.DayLocator())
-    plt.plot(x, y_test, y_pred)
-    plt.gcf().autofmt_xdate()
-
     plt.legend()
     plt.show()
 
