@@ -3,24 +3,12 @@ import pandas as pd
 import numpy as np
 
 
-
-STOCKS =[
-    "AMC"
-]
-
-
-def get_daily_stock_prices():
-    # gets daily stock data for
+def get_daily_stock_prices(stock_tickers):
     data = yf.download(
-        tickers=" ".join(STOCKS),
+        tickers=" ".join(stock_tickers),
         period="10y",
         interval="1d",
     )
 
-    data.to_csv('dataset/daily_stock_prices_all_numbers.csv')
+    data.to_csv('dataset/daily_stock_price_data.csv')
     print(data)
-
-
-get_daily_stock_prices()
-
-
