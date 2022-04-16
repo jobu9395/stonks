@@ -14,7 +14,6 @@ def join_yfinance_with_reddit_comments():
     # drops all price data except for AMC's, drops the "Date" column and keeps the "date" columns to enable proper join
     price_df = pd.read_csv('dataset/daily_stock_prices.csv')
     price_df['Date'] = pd.to_datetime(price_df['Date']).dt.date
-    price_df = price_df.drop(['Date', 'GME'], axis=1)
 
     # left join to include non trading day's comments
     training_df = comments_df.merge(
@@ -44,24 +43,23 @@ def join_yfinance_with_reddit_comments():
     training_df.to_csv('dataset/training_data.csv')
 
 
-
 def aggregate_sentiment_scores():
     # removes unused columns
     comments_df = pd.read_csv('dataset/wallstreetbets-comments.csv')
     df = comments_df.drop(['comment_id', 'comment_body'], axis=1)
-    df = df.iloc[: , 1:]
+    df = df[['Date', 'neg', 'neu', 'pos', 'compound']]
     df['Date'] = pd.to_datetime(df['Date']).dt.date
-    
-    # aggreages scores by day
     df = df.groupby(df['Date'])['neg', 'neu', 'pos', 'compound'].mean()
-    print(df.columns, df.index)
-    # load yfinance data
+    df = df.reset_index()
+
     price_df = pd.read_csv('dataset/daily_stock_price_data.csv')
     price_df['Date'] = pd.to_datetime(price_df['Date']).dt.date
-    print(price_df.columns, price_df.index)
+
     training_df = df.merge(price_df, how='left')
     training_df = training_df.fillna(method='bfill')
-    print(training_df.head())
+
+    training_df = training_df.set_index('Date')
+    training_df.to_csv('dataset/training_data.csv')
 
 
 if __name__ == "__main__":

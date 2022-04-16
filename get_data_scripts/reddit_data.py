@@ -8,10 +8,9 @@ from scripts import data_clean, sentiment
 
 # TODO change this from global vars to params passed into `get_post_statistics()`
 STOCKS = [
-    "GME",
     "AMC"
 ]
-AMOUNT = 10
+AMOUNT = 500
 
 
 # def scrape_wikipedia_for_sp_500():

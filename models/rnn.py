@@ -10,11 +10,11 @@ import datetime as dt
 '''This models past numeric only data related to price using an RNN.'''
 
 # global vars
-TRAINING_DATA_FILE = 'dataset/daily_stock_price_data.csv'
+TRAINING_DATA_FILE = 'dataset/training_data.csv'
 TRAIN_SPLIT_DATE_STRING = '2022-03-01'
 LAGGING_DAYS_FOR_TRAINING_DATA = 10
 BATCH_SIZE = 32
-EPOCH_COUNT = 5
+EPOCH_COUNT = 100
 
 
 def train_model():
@@ -124,12 +124,12 @@ def train_model():
     plt.xlabel('Time')
     plt.ylabel('AMC Stock Price')
 
-    x = [dt.datetime.strptime(d, '%m/%d/%Y').date() for d in y_test['dates']]
-
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
-    plt.gca().xaxis.set_major_locator(mdates.DayLocator())
-    plt.plot(x, y_test, y_pred)
-    plt.gcf().autofmt_xdate()
+    # x = [dt.datetime.strptime(d, '%m/%d/%Y').date() for d in y_test['dates']]
+    #
+    # plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%m/%d/%Y'))
+    # plt.gca().xaxis.set_major_locator(mdates.DayLocator())
+    # plt.plot(x, y_test, y_pred)
+    # plt.gcf().autofmt_xdate()
 
     plt.legend()
     plt.show()
