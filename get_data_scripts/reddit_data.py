@@ -3,7 +3,7 @@ import pandas as pd
 import datetime as dt
 from get_data_scripts import reddit_client
 from praw.models import MoreComments
-from scripts import data_clean
+from scripts import data_clean, sentiment
 
 
 # TODO change this from global vars to params passed into `get_post_statistics()`
@@ -11,7 +11,7 @@ STOCKS = [
     "GME",
     "AMC"
 ]
-AMOUNT = 500
+AMOUNT = 10
 
 
 # def scrape_wikipedia_for_sp_500():
@@ -30,14 +30,13 @@ def get_post_statistics(subreddit: str) -> None:
             dict_post = {}
             dict_post['ticker'] = ticker
             dict_post['post_id'] = submission.id
-            dict_post['date'] = dt.datetime.fromtimestamp(submission.created_utc)
+            dict_post['Date'] = dt.datetime.fromtimestamp(submission.created_utc)
             dict_post['title'] = submission.title
             dict_post['post_name'] = submission.name
             dict_post['score'] = submission.score
             dict_post['upvote_ratio'] = submission.upvote_ratio
             dict_post['num_comments'] = submission.num_comments
-            if dict_post['date'] > dt.datetime(2017, 4, 1):
-                submission_statistics.append(dict_post)
+            submission_statistics.append(dict_post)
 
             comments = submission.comments.list()
             comment_set = set()
@@ -50,15 +49,17 @@ def get_post_statistics(subreddit: str) -> None:
                     dict_comment = {}
                     dict_comment['comment_ticker'] = ticker
                     dict_comment['comment_id'] = comment
-                    dict_comment['date'] = dt.datetime.fromtimestamp(comment.created_utc)
+                    dict_comment['Date'] = dt.datetime.fromtimestamp(comment.created_utc)
                     dict_comment['comment_body'] = body
 
                 comment_list.append(dict_comment)
 
     submission_statistics_df = pd.DataFrame(submission_statistics)
-    submission_statistics_df.sort_values(by='date')
+    submission_statistics_df.sort_values(by='Date')
     submission_statistics_df.to_csv(f'dataset/{subreddit}-posts.csv')
 
     comments_df = pd.DataFrame(comment_list)
-    comments_df.sort_values(by='date')
+    sentiment_scores = comments_df['comment_body'].apply(lambda c: pd.Series(sentiment.score_comments(c)))
+    comments_df = pd.concat([comments_df, sentiment_scores], axis=1)
+    comments_df.sort_values(by='Date')
     comments_df.to_csv(f'dataset/{subreddit}-comments.csv')
