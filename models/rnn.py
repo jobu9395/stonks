@@ -10,9 +10,10 @@ import datetime as dt
 '''This models past numeric only data related to price using an RNN.'''
 
 # global vars
-TRAINING_DATA_FILE = 'dataset/training_data.csv'
-TRAIN_SPLIT_DATE_STRING = '2022-03-01'
-LAGGING_DAYS_FOR_TRAINING_DATA = 10
+TRAINING_DATA_FILE = 'dataset/daily_stock_price_data.csv'
+# TRAINING_DATA_FILE = 'dataset/training_data.csv'
+TRAIN_SPLIT_DATE_STRING = '2022-03-15'
+LAGGING_DAYS_FOR_TRAINING_DATA = 15
 BATCH_SIZE = 32
 EPOCH_COUNT = 100
 
@@ -26,8 +27,8 @@ def train_model():
     data_training = df[df['Date'] < TRAIN_SPLIT_DATE_STRING].copy()
     data_test = df[df['Date'] >= TRAIN_SPLIT_DATE_STRING].copy()
 
-    training_data = data_training.drop(['Date'], axis=1)
-    test_data = data_test.drop(['Date'], axis=1)
+    training_data = data_training.drop(['Date', 'Adj Close'], axis=1)
+    test_data = data_test.drop(['Date', 'Adj Close'], axis=1)
 
     print(f"training data head: \n {training_data.head()}\n")
     print(f"test data head: \n {test_data.head()}\n")
@@ -42,6 +43,7 @@ def train_model():
 
     for i in range(LAGGING_DAYS_FOR_TRAINING_DATA, training_data.shape[0]):
         X_train.append(training_data[i-LAGGING_DAYS_FOR_TRAINING_DATA:i])
+        print(training_data[i, 0])
         y_train.append(training_data[i, 0])
 
     X_train, y_train = np.array(X_train), np.array(y_train)
@@ -96,7 +98,7 @@ def train_model():
     past_training_days = data_training.tail(LAGGING_DAYS_FOR_TRAINING_DATA)
     df = past_training_days.append(data_test, ignore_index=True)
 
-    df = df.drop(['Date'], axis=1)
+    df = df.drop(['Date', 'Adj Close'], axis=1)
     inputs = scaler.transform(df)
 
     X_test = []

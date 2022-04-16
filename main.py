@@ -5,12 +5,14 @@ from get_data_scripts.yfinance_all_price_data import get_daily_stock_prices
 from models.rnn import train_model
 
 
-STOCKS = ['AMC']
+STOCKS = [
+    'AMC'
+]
 
 
 def main():
-    get_post_statistics("wallstreetbets")
-    get_daily_stock_prices(STOCKS)
+    # get_post_statistics("wallstreetbets")
+    # get_daily_stock_prices(STOCKS)
     print(f"scraped stock data for: {STOCKS}, training model")
     train_model()
 
