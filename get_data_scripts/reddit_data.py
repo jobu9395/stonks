@@ -10,7 +10,7 @@ from scripts import data_clean, sentiment
 STOCKS = [
     "AMC"
 ]
-AMOUNT = 500
+AMOUNT = 20
 
 
 # def scrape_wikipedia_for_sp_500():

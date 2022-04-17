@@ -17,6 +17,7 @@ dependencies:
   - yfinance
   - tensorflow
   - tensorflow-gpu
-  - pip:
-      - sklearn
+  - comet_ml
+  # - pip:
+  #     - sklearn
 

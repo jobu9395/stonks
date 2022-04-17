@@ -1,20 +1,34 @@
+from comet_ml import Experiment
+import os
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, LSTM, Dropout
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime as dt
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Dropout
+from dotenv import load_dotenv
+load_dotenv()
 
 '''This models past numeric only data related to price using an RNN.'''
 
+experiment = Experiment(
+    api_key = os.getenv('api_key'),
+    project_name = os.getenv('project_name'),
+    workspace = os.getenv('workspace')
+)
 # global vars
+hyper_params = {
+    'lagging_days': 10,
+    'dropout': 0.1,
+    'batch_size': 32,
+    'epochs': 100
+}
+experiment.log_parameters(hyper_params)
+
 TRAINING_DATA_FILE = 'dataset/training_data.csv'
 TRAIN_SPLIT_DATE_STRING = '2022-03-01'
-LAGGING_DAYS_FOR_TRAINING_DATA = 10
-BATCH_SIZE = 32
-EPOCH_COUNT = 100
 
 
 def train_model():
@@ -23,8 +37,8 @@ def train_model():
         date_parser=True
     )
 
-    data_training = df[df['Date'] < TRAIN_SPLIT_DATE_STRING].copy()
-    data_test = df[df['Date'] >= TRAIN_SPLIT_DATE_STRING].copy()
+    data_training = df[df['Date'] < hyper_params['lagging_days']].copy()
+    data_test = df[df['Date'] >= hyper_params['lagging_days']].copy()
 
     training_data = data_training.drop(['Date'], axis=1)
     test_data = data_test.drop(['Date'], axis=1)
@@ -36,12 +50,13 @@ def train_model():
 
     scaler = MinMaxScaler()
     training_data = scaler.fit_transform(training_data)
+    experiment.log_dataset_hash(training_data)
 
     X_train = []
     y_train = []
 
-    for i in range(LAGGING_DAYS_FOR_TRAINING_DATA, training_data.shape[0]):
-        X_train.append(training_data[i-LAGGING_DAYS_FOR_TRAINING_DATA:i])
+    for i in range(hyper_params['lagging_days'], training_data.shape[0]):
+        X_train.append(training_data[i-hyper_params['lagging_days']:i])
         y_train.append(training_data[i, 0])
 
     X_train, y_train = np.array(X_train), np.array(y_train)
@@ -86,14 +101,15 @@ def train_model():
         loss='mean_squared_error',
     )
 
-    regressor.fit(
-        X_train,
-        y_train,
-        epochs=EPOCH_COUNT,
-        batch_size=BATCH_SIZE,
-    )
+    with experiment.content_manager("training"):
+        regressor.fit(
+            X_train,
+            y_train,
+            epochs=hyper_params['epochs'],
+            batch_size=hyper_params['batch_size'],
+        )
 
-    past_training_days = data_training.tail(LAGGING_DAYS_FOR_TRAINING_DATA)
+    past_training_days = data_training.tail(hyper_params['lagging_days'])
     df = past_training_days.append(data_test, ignore_index=True)
 
     df = df.drop(['Date'], axis=1)
@@ -102,8 +118,8 @@ def train_model():
     X_test = []
     y_test = []
 
-    for i in range(LAGGING_DAYS_FOR_TRAINING_DATA, inputs.shape[0]):
-        X_test.append(inputs[i-LAGGING_DAYS_FOR_TRAINING_DATA:i])
+    for i in range(hyper_params['lagging_days'], inputs.shape[0]):
+        X_test.append(inputs[i-hyper_params['lagging_days']:i])
         y_test.append(inputs[i, 0])
 
     X_test, y_test = np.array(X_test), np.array(y_test)
@@ -124,6 +140,7 @@ def train_model():
     plt.xlabel('Time')
     plt.ylabel('AMC Stock Price')
     plt.legend()
+    experiment.log_figure(figure=plt)
     plt.show()
 
 
