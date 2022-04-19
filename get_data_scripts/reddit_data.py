@@ -13,13 +13,6 @@ STOCKS = [
 AMOUNT = 20
 
 
-# def scrape_wikipedia_for_sp_500():
-#     payload = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-#     df = payload[0]
-#     ordered_list_of_tickers = df[df.columns[0]]
-#     ordered_list_of_tickers.to_csv('dataset/ticker_list.csv')
-
-
 def get_post_statistics(subreddit: str) -> None:
     sub = reddit_client.connect(subreddit)
     submission_statistics = []

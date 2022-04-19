@@ -6,7 +6,9 @@ from get_data_scripts.yfinance_all_price_data import get_daily_stock_prices
 # from models.rnn import train_model
 
 
-STOCKS = ['AMC']
+STOCKS = [
+    'AMC'
+]
 
 
 def main():

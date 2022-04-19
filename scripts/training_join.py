@@ -12,7 +12,7 @@ def join_yfinance_with_reddit_comments():
     comments_df = comments_df[comments_df['comment_ticker'] == 'AMC']
 
     # drops all price data except for AMC's, drops the "Date" column and keeps the "date" columns to enable proper join
-    price_df = pd.read_csv('dataset/daily_stock_prices.csv')
+    price_df = pd.read_csv('dataset/daily_stock_price_data.csv')
     price_df['Date'] = pd.to_datetime(price_df['Date']).dt.date
 
     # left join to include non trading day's comments
