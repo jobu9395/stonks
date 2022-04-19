@@ -7,18 +7,18 @@ from scripts import data_clean, sentiment
 
 
 # TODO change this from global vars to params passed into `get_post_statistics()`
-STOCKS = [
-    "AMC"
-]
-AMOUNT = 500
+# STOCKS = [
+#     "AMC"
+# ]
+# AMOUNT = 500
 
 
-def get_post_statistics(subreddit: str) -> None:
+def get_post_statistics(subreddit: str, stocks: str, num_posts: str) -> None:
     sub = reddit_client.connect(subreddit)
     submission_statistics = []
     comment_list = []
-    for ticker in STOCKS:
-        for submission in sub.search(ticker, limit=AMOUNT):
+    for ticker in stocks:
+        for submission in sub.search(ticker, limit=num_posts):
             dict_post = {}
             dict_post['ticker'] = ticker
             dict_post['post_id'] = submission.id
@@ -45,6 +45,7 @@ def get_post_statistics(subreddit: str) -> None:
                     dict_comment['comment_body'] = body
 
                 comment_list.append(dict_comment)
+                print("new comment added")
 
     submission_statistics_df = pd.DataFrame(submission_statistics)
     submission_statistics_df.sort_values(by='Date')
