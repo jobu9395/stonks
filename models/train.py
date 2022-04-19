@@ -6,6 +6,7 @@ import torch
 import time
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from torch import nn
 from sklearn.preprocessing import MinMaxScaler
@@ -33,20 +34,23 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 class RedditStockModel(nn.Module):
-    def __init__(self, hidden_size, dropout):
+    def __init__(self, input_size, lagging_days, hidden_size, dropout):
         super().__init__()
-        # self.input_size = input_size
+        self.input_size = input_size
+        self.lagging_days = lagging_days
         self.hidden_size = hidden_size
         self.dropout = dropout
-        self.lstm = nn.LSTM(input_size=10, 
-                            hidden_size=self.hidden_size, 
+        self.lstm = nn.LSTM(input_size=self.input_size,
+                            hidden_size=self.hidden_size,
                             num_layers=4,
                             dropout=self.dropout)
-        self.linear = nn.Linear(self.hidden_size, 1)
+        self.flat = nn.Flatten()
+        self.linear = nn.Linear(self.lagging_days * self.hidden_size, 1)
 
     def forward(self, input):
         lstm_out, (h, c) = self.lstm(input)
-        linear = self.linear(lstm_out)
+        flatten = self.flat(lstm_out)
+        linear = self.linear(flatten)
         return linear
 
 
@@ -57,7 +61,7 @@ hyper_params = {
     'lagging_days': 10,
     'dropout': 0.1,
     'batch_size': 32,
-    'epochs': 100,
+    'epochs': 30,
     'learning_rate': 0.1
 }
 
@@ -82,8 +86,8 @@ def pre_train():
     data_training = df[df['Date'] < TRAIN_SPLIT_DATE_STRING].copy()
     data_test = df[df['Date'] >= TRAIN_SPLIT_DATE_STRING].copy()
 
-    training_data = data_training.drop(['Date'], axis=1)
-    # test_data = data_test.drop(['Date'], axis=1)
+    training_data = data_training.drop(['Date', 'Adj Close'], axis=1)
+    test_data = data_test.drop(['Date', 'Adj Close'], axis=1)
 
     scaler = MinMaxScaler()
     training_data = scaler.fit_transform(training_data)
@@ -103,7 +107,7 @@ def pre_train():
     past_training_days = data_training.tail(hyper_params['lagging_days'])
     df = past_training_days.append(data_test, ignore_index=True)
 
-    df = df.drop(['Date'], axis=1)
+    df = df.drop(['Date', 'Adj Close'], axis=1)
     inputs = scaler.transform(df)
 
     X_test = []
@@ -125,7 +129,9 @@ def train(epoch, X_train, y_train, model, optimizer, criterion):
     acc = AverageMeter()
 
     for idx, (data, target) in enumerate(zip(X_train, y_train)):
+        data = torch.unsqueeze(data, dim=0)
         target = torch.unsqueeze(target, dim=0)
+        
         start = time.time()
 
         if torch.cuda.is_available():
@@ -161,6 +167,7 @@ def validate(epoch, X_test, y_test, model, criterion):
 
     # evaluation loop
     for idx, (data, target) in enumerate(zip(X_test, y_test)):
+        data = torch.unsqueeze(data, dim=0)
         target = torch.unsqueeze(target, dim=0)
         start = time.time()
 
@@ -197,8 +204,11 @@ def main():
     X_train, y_train, X_test, y_test = pre_train()
     print("Data prep complete!")
 
-    model = RedditStockModel(hidden_size=32, dropout=0.1)
-    # experiment.log_model(model)
+    input_size = X_train.shape[2]
+    model = RedditStockModel(input_size=input_size, 
+                             lagging_days=hyper_params['lagging_days'],
+                             hidden_size=32, 
+                             dropout=0.1)
     
     optimizer = torch.optim.Adam(model.parameters(), hyper_params['learning_rate'])
     loss_fn = torch.nn.MSELoss()
@@ -214,5 +224,26 @@ def main():
         experiment.log_metric("val loss", val_losses.avg, epoch=epoch)
         experiment.log_metric("val acc", val_acc.avg, epoch=epoch)
         
+    model.eval()
+    with torch.no_grad():
+        
+        y_pred = model(X_test)
+        y_pred = y_pred.numpy()
+        
+        print(y_pred.shape)
+        
+        y_test = y_test.numpy()
+        
+        """Visualization"""
+
+        plt.figure(figsize=(14, 5))
+        plt.plot(y_test, color='red', label='Real AMC Stock Price')
+        plt.plot(y_pred, color='blue', label='Predicted AMC Stock Price')
+        plt.title('AMC Stock Price Prediction using LSTM neural network')
+        plt.xlabel('Time')
+        plt.ylabel('AMC Stock Price')
+        plt.legend()
+        experiment.log_figure(figure=plt)
+        plt.show()
 
     # experiment.end()
