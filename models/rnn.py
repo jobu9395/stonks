@@ -15,7 +15,7 @@ TRAINING_DATA_FILE = 'dataset/daily_stock_price_data.csv'
 TRAIN_SPLIT_DATE_STRING = '2022-03-15'
 LAGGING_DAYS_FOR_TRAINING_DATA = 15
 BATCH_SIZE = 32
-EPOCH_COUNT = 100
+EPOCH_COUNT = 20
 
 
 def train_model():

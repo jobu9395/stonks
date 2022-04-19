@@ -6,13 +6,6 @@ from praw.models import MoreComments
 from scripts import data_clean, sentiment
 
 
-# TODO change this from global vars to params passed into `get_post_statistics()`
-# STOCKS = [
-#     "AMC"
-# ]
-# AMOUNT = 500
-
-
 def get_post_statistics(subreddit: str, stocks: str, num_posts: str) -> None:
     sub = reddit_client.connect(subreddit)
     submission_statistics = []
