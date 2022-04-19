@@ -38,7 +38,7 @@ class RedditStockModel(nn.Module):
         # self.input_size = input_size
         self.hidden_size = hidden_size
         self.dropout = dropout
-        self.lstm = nn.LSTM(input_size=1, 
+        self.lstm = nn.LSTM(input_size=10, 
                             hidden_size=self.hidden_size, 
                             num_layers=4,
                             dropout=self.dropout)
@@ -79,11 +79,11 @@ def pre_train():
         TRAINING_DATA_FILE,
         date_parser=True
     )
-    data_training = df[df['Date'] < hyper_params['lagging_days']].copy()
-    data_test = df[df['Date'] >= hyper_params['lagging_days']].copy()
+    data_training = df[df['Date'] < TRAIN_SPLIT_DATE_STRING].copy()
+    data_test = df[df['Date'] >= TRAIN_SPLIT_DATE_STRING].copy()
 
     training_data = data_training.drop(['Date'], axis=1)
-    test_data = data_test.drop(['Date'], axis=1)
+    # test_data = data_test.drop(['Date'], axis=1)
 
     scaler = MinMaxScaler()
     training_data = scaler.fit_transform(training_data)
@@ -97,6 +97,8 @@ def pre_train():
         y_train.append(training_data[i, 0])
 
     X_train, y_train = np.array(X_train), np.array(y_train)
+    X_train = torch.from_numpy(X_train).float()
+    y_train = torch.from_numpy(y_train).float()
 
     past_training_days = data_training.tail(hyper_params['lagging_days'])
     df = past_training_days.append(data_test, ignore_index=True)
@@ -112,6 +114,8 @@ def pre_train():
         y_test.append(inputs[i, 0])
 
     X_test, y_test = np.array(X_test), np.array(y_test)
+    X_test = torch.from_numpy(X_test).float()
+    y_test = torch.from_numpy(y_test).float()
 
     return X_train, y_train, X_test, y_test
 
@@ -121,6 +125,7 @@ def train(epoch, X_train, y_train, model, optimizer, criterion):
     acc = AverageMeter()
 
     for idx, (data, target) in enumerate(zip(X_train, y_train)):
+        target = torch.unsqueeze(target, dim=0)
         start = time.time()
 
         if torch.cuda.is_available():
@@ -145,7 +150,9 @@ def train(epoch, X_train, y_train, model, optimizer, criterion):
                    'Time {iter_time.val:.3f} ({iter_time.avg:.3f})\t'
                    'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                    'Prec @1 {top1.val:.4f} ({top1.avg:.4f})\t')
-                  .format(epoch, idx, len(zip(X_train, y_train)), iter_time=iter_time, loss=losses, top1=acc))
+                  .format(epoch, idx, len(list(zip(X_train, y_train))), iter_time=iter_time, loss=losses, top1=acc))
+            
+    return losses, acc
 
 def validate(epoch, X_test, y_test, model, criterion):
     iter_time = AverageMeter()
@@ -154,6 +161,7 @@ def validate(epoch, X_test, y_test, model, criterion):
 
     # evaluation loop
     for idx, (data, target) in enumerate(zip(X_test, y_test)):
+        target = torch.unsqueeze(target, dim=0)
         start = time.time()
 
         if torch.cuda.is_available():
@@ -172,9 +180,9 @@ def validate(epoch, X_test, y_test, model, criterion):
         if idx % 10 == 0:
             print(('Epoch: [{0}][{1}/{2}]\t'
                    'Time {iter_time.val:.3f} ({iter_time.avg:.3f})\t')
-                  .format(epoch, idx, len(zip(X_test, y_test)), iter_time=iter_time, loss=losses, top1=acc))
+                  .format(epoch, idx, len(list(zip(X_test, y_test))), iter_time=iter_time, loss=losses, top1=acc))
 
-    return acc.avg
+    return losses, acc
 
 def main():
     experiment = Experiment(
@@ -182,17 +190,29 @@ def main():
         project_name = os.getenv('project_name'),
         workspace = os.getenv('workspace')
     )
+    print("Logging Hyperparameters")
     experiment.log_parameters(hyper_params)
     # pre train stuff goes here
+    print("Getting data ready...")
     X_train, y_train, X_test, y_test = pre_train()
+    print("Data prep complete!")
 
     model = RedditStockModel(hidden_size=32, dropout=0.1)
+    # experiment.log_model(model)
+    
     optimizer = torch.optim.Adam(model.parameters(), hyper_params['learning_rate'])
     loss_fn = torch.nn.MSELoss()
 
+    print("Begin Training!")
     for epoch in range(hyper_params['epochs']):
 
-        train(epoch, X_train, y_train, model, optimizer, loss_fn)
-        acc = validate(epoch, X_test, y_test, model, optimizer, loss_fn)
+        train_losses, train_acc = train(epoch, X_train, y_train, model, optimizer, loss_fn)
+        val_losses, val_acc = validate(epoch, X_test, y_test, model, loss_fn)
+        
+        experiment.log_metric("train loss", train_losses.avg, epoch=epoch)
+        experiment.log_metric("train acc", train_acc.avg, epoch=epoch)
+        experiment.log_metric("val loss", val_losses.avg, epoch=epoch)
+        experiment.log_metric("val acc", val_acc.avg, epoch=epoch)
+        
 
-    experiment.end()
+    # experiment.end()
