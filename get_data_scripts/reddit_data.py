@@ -10,7 +10,7 @@ from scripts import data_clean, sentiment
 STOCKS = [
     "AMC"
 ]
-AMOUNT = 20
+AMOUNT = 500
 
 
 def get_post_statistics(subreddit: str) -> None:
