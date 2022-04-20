@@ -6,7 +6,7 @@ from praw.models import MoreComments
 from scripts import data_clean, sentiment
 
 
-def get_post_statistics(subreddit: str, stocks: str, num_posts: str) -> None:
+def get_post_statistics(subreddit: str, stocks: list, num_posts: int) -> None:
     sub = reddit_client.connect(subreddit)
     submission_statistics = []
     comment_list = []
@@ -22,6 +22,7 @@ def get_post_statistics(subreddit: str, stocks: str, num_posts: str) -> None:
             dict_post['upvote_ratio'] = submission.upvote_ratio
             dict_post['num_comments'] = submission.num_comments
             submission_statistics.append(dict_post)
+            print("new post added")
 
             comments = submission.comments.list()
             comment_set = set()
@@ -38,7 +39,7 @@ def get_post_statistics(subreddit: str, stocks: str, num_posts: str) -> None:
                     dict_comment['comment_body'] = body
 
                 comment_list.append(dict_comment)
-                print("new comment added")
+
 
     submission_statistics_df = pd.DataFrame(submission_statistics)
     submission_statistics_df.sort_values(by='Date')

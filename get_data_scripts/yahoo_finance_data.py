@@ -11,4 +11,4 @@ def get_daily_stock_prices(stocks):
     )
 
     data.to_csv('dataset/daily_stock_price_data.csv')
-    print(data)
+    print(data.head())

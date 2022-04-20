@@ -1,5 +1,8 @@
 import pandas as pd
 from datetime import date, timedelta
+import warnings
+
+warnings.filterwarnings('ignore')
 
 
 # TODO create a method for joining word vector embeddings with price data
@@ -20,13 +23,14 @@ def aggregate_sentiment_scores(subreddit:str):
     training_df = comments_df.merge(price_df, how='left')
     training_df = training_df.fillna(method='bfill')
 
-    # assign Date to index column
+    # assign Date to index column, drop 'adj close' column to prevent data leakage
     training_df = training_df.set_index('Date')
+    training_df = training_df.drop('Adj Close', axis=1)
     # re order columns to group by sentiment score first, then price data, with 'Close' as last column for label
     training_df = training_df.reindex(
         columns=[
             'neg', 'neu', 'pos', 'compound', # sentiment scores
-            'Open', 'High', 'Low', 'Adj Close', 'Volume', # price data
+            'Open', 'High', 'Low', 'Volume', # price data
             'Close' # label
         ]
     )
