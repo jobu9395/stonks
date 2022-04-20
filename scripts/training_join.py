@@ -29,9 +29,9 @@ def aggregate_sentiment_scores(subreddit:str):
     # re order columns to group by sentiment score first, then price data, with 'Close' as last column for label
     training_df = training_df.reindex(
         columns=[
+            'Close',  # label
             'neg', 'neu', 'pos', 'compound', # sentiment scores
             'Open', 'High', 'Low', 'Volume', # price data
-            'Close' # label
         ]
     )
     training_df.to_csv('dataset/training_data.csv')
