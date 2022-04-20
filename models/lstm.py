@@ -113,10 +113,16 @@ def normalize(data, train_split):
     return (data - data_mean) / data_std
 
 
-features = df[df.columns]
+print(
+    "The selected parameters are:",
+    ", ".join([titles[i] for i in [0, 1, 2, 3, 4, 5, 6, 7]]),
+)
+selected_features = [feature_keys[i] for i in [0, 1, 2, 3, 4, 5, 6, 7]]
+features = df[selected_features]
 features.index = df[date_time_key]
+features.head()
 
-features = normalize(df.values, train_split)
+features = normalize(features.values, train_split)
 features = pd.DataFrame(features)
 features.head()
 
@@ -128,7 +134,7 @@ val_data = features.loc[train_split:]
 start = past + future
 end = start + train_split
 
-x_train = train_data[[i for i in range(7)]].values
+x_train = train_data[[i for i in range(len(features.columns))]].values
 y_train = features.iloc[start:end][[1]]
 
 sequence_length = int(past / step)
