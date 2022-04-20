@@ -16,7 +16,7 @@ NUM_POSTS = 500
 
 def main():
     # get_post_statistics(subreddit=SUBREDDIT, stocks=STOCKS, num_posts=NUM_POSTS)
-    get_daily_stock_prices(stocks=STOCKS)
+    # get_daily_stock_prices(stocks=STOCKS)
     aggregate_sentiment_scores(subreddit=SUBREDDIT)
     print(f"scraped stock data for: {STOCKS}, training model")
     train_model()
