@@ -120,7 +120,7 @@ print(
 selected_features = [feature_keys[i] for i in [0, 1, 2, 3, 4, 5, 6, 7]]
 features = df[selected_features]
 features.index = df[date_time_key]
-features.head()
+print(features.head())
 
 features = normalize(features.values, train_split)
 features = pd.DataFrame(features)
@@ -134,7 +134,7 @@ val_data = features.loc[train_split:]
 start = past + future
 end = start + train_split
 
-x_train = train_data[[i for i in range(len(features.columns))]].values
+x_train = train_data[[i for i in range(7)]].values
 y_train = features.iloc[start:end][[1]]
 
 sequence_length = int(past / step)
@@ -204,6 +204,7 @@ history = model.fit(
 )
 
 #################################################
+
 
 def visualize_loss(history, title):
     loss = history.history["loss"]
