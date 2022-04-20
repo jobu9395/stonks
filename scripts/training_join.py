@@ -20,7 +20,7 @@ def aggregate_sentiment_scores(subreddit:str):
     price_df = pd.read_csv('dataset/daily_stock_price_data.csv', engine='python', error_bad_lines=False)
     price_df['Date'] = pd.to_datetime(price_df['Date'], errors='coerce').dt.date
 
-    training_df = comments_df.merge(price_df, how='left')
+    training_df = price_df.merge(comments_df, how='left')
     training_df = training_df.fillna(method='bfill')
 
     # assign Date to index column, drop 'adj close' column to prevent data leakage

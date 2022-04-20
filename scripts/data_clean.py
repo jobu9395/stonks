@@ -5,6 +5,9 @@ nltk.download("stopwords")
 from string import punctuation
 from typing import List
 from nltk.corpus import stopwords
+import warnings
+
+warnings.filterwarnings('ignore')
 
 STOPWORDS = set(stopwords.words('english'))
 STOPWORDS.update(['deleted', '', 'edit', '\n'])
