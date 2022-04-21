@@ -1,18 +1,50 @@
+import os
+from comet_ml import Experiment
+
 import pandas as pd
 import numpy as np
 import keras
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from pandas.plotting import register_matplotlib_converters
-register_matplotlib_converters()
+# register_matplotlib_converters()
 from keras.preprocessing.sequence import TimeseriesGenerator
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
+from keras.layers import Dense, LSTM, Dropout
+from dotenv import load_dotenv
 import warnings
 warnings.filterwarnings('ignore')
 
-df = pd.read_csv('dataset/training_data.csv')
+
+# connect to comet to record experiments
+load_dotenv()
+experiment = Experiment(
+    api_key=os.getenv('comet_api_key'),
+    project_name=os.getenv('comet_project_name'),
+    workspace=os.getenv('comet_workspace'),
+)
+
+"""Global variables"""
+EPOCHS = 20
+N_INPUT = 30  # trailing trading day count
+BATCH_SIZE = 32
+FILENAME = 'dataset/training_data.csv'
+# FILENAME = 'dataset/daily_stock_price_data.csv'
+
+hyperparams = {
+    FILENAME,
+    EPOCHS,
+    N_INPUT,
+    BATCH_SIZE,
+}
+
+# log hyperparameters
+experiment.log_parameter("hyperparameters", hyperparams)
+print("connection succesful")
+
+# read in data
+df = pd.read_csv(FILENAME)
+
 
 titles = [
     'neg',
@@ -53,7 +85,6 @@ colors = [
 
 date_time_key = "Date"
 
-################################################
 
 def show_raw_visualization(data):
     time_data = data[date_time_key]
@@ -74,7 +105,8 @@ def show_raw_visualization(data):
         )
         ax.legend([titles[i]])
     plt.tight_layout()
-    plt.savefig('figures/periodicity_sentiment_price_data.png')
+    periodicity = plt.savefig('figures/periodicity_sentiment_price_data.png')
+    experiment.log_figure(periodicity)
     # plt.show()
 
 
@@ -87,7 +119,8 @@ def show_heatmap(data):
     cb = plt.colorbar()
     cb.ax.tick_params(labelsize=14)
     plt.title("Feature Correlation Heatmap", fontsize=14)
-    plt.savefig('figures/correlation_heatmap.png')
+    heatmap = plt.savefig('figures/correlation_heatmap.png')
+    experiment.log_figure(heatmap)
     # plt.show()
 
 
@@ -96,58 +129,92 @@ def time_series_prediction(df):
     print(df.head())
     y_col = 'Close' # define y variable, i.e., what we want to predict
 
-    test_size = int(len(df) * 0.05) # here I ask that the test data will be 10% (0.1) of the entire data
-    train = df.iloc[:-test_size, :].copy() # the copy() here is important, it will prevent us from getting: SettingWithCopyWarning: A value is trying to be set on a copy of a slice from a DataFrame.
-    # Try using .loc[row_index,col_indexer] = value instead
+    test_size = int(len(df) * 0.05)
+    train = df.iloc[:-test_size, :].copy()
     test = df.iloc[-test_size:, :].copy()
 
-    X_train = train.drop(y_col,axis=1).copy()
-    y_train = train[[y_col]].copy() # the double brakets here are to keep the y in dataframe format, otherwise it will be pandas Series
+    X_train = train.drop(y_col, axis=1).copy()
+    y_train = train[[y_col]].copy()
 
-    Xscaler = MinMaxScaler(feature_range=(0, 1)) # scale so that all the X data will range from 0 to 1
+    Xscaler = MinMaxScaler(feature_range=(0, 1))
     Xscaler.fit(X_train)
     scaled_X_train = Xscaler.transform(X_train)
     Yscaler = MinMaxScaler(feature_range=(0, 1))
     Yscaler.fit(y_train)
     scaled_y_train = Yscaler.transform(y_train)
-    scaled_y_train = scaled_y_train.reshape(-1) # remove the second dimention from y so the shape changes from (n,1) to (n,)
+    scaled_y_train = scaled_y_train.reshape(-1)
 
     scaled_y_train = np.insert(scaled_y_train, 0, 0)
     scaled_y_train = np.delete(scaled_y_train, -1)
 
-    n_input = 30 #how many samples/rows/timesteps to look in the past in order to forecast the next sample
-    n_features= X_train.shape[1] # how many predictors/Xs/features we have to predict y
-    b_size = 32 # Number of timeseries samples in each batch
+    n_features = X_train.shape[1]
     generator = TimeseriesGenerator(
         scaled_X_train,
         scaled_y_train,
-        length=n_input,
-        batch_size=b_size
+        length=N_INPUT,
+        batch_size=BATCH_SIZE
     )
 
-    model = Sequential()
-    model.add(LSTM(150, activation='relu', input_shape=(n_input, n_features)))
-    model.add(Dense(1))
-    model.compile(optimizer='adam', loss='mse')
+    model = Sequential(
+        [
+            LSTM(
+                units=50,
+                activation='relu',
+                return_sequences=True,
+                input_shape=(N_INPUT, n_features)
+            ),
+            Dropout(0.1),
+            LSTM(
+                units=60,
+                activation='relu',
+                return_sequences=True,
+            ),
+            Dropout(0.09),
+            LSTM(
+                units=70,
+                activation='relu',
+                return_sequences=True,
+            ),
+            Dropout(0.08),
+            LSTM(
+                units=80,
+                activation='relu',
+            ),
+            Dropout(0.07),
+            Dense(
+                units=1
+            )
+        ]
+    )
+
     print(model.summary())
 
-    model.fit_generator(generator, epochs=50)
+    model.compile(
+        optimizer='adam',
+        loss='mean_squared_error',
+    )
+
+    model.fit_generator(generator, epochs=EPOCHS)
 
     loss_per_epoch = model.history.history['loss']
     plt.plot(range(len(loss_per_epoch)), loss_per_epoch)
-    # plt.savefig('figures/loss_curve.png')
+    loss_curve = plt.savefig('figures/loss_curve.png')
+    experiment.log_figure(loss_curve)
+    experiment.log_metric("loss", loss_per_epoch)
     # plt.show()
 
-    X_test = test.drop(y_col,axis=1).copy()
+    X_test = test.drop(y_col, axis=1).copy()
     scaled_X_test = Xscaler.transform(X_test)
-    test_generator = TimeseriesGenerator(scaled_X_test, np.zeros(len(X_test)), length=n_input, batch_size=b_size)
+    test_generator = TimeseriesGenerator(scaled_X_test, np.zeros(len(X_test)), length=N_INPUT, batch_size=BATCH_SIZE)
 
     y_pred_scaled = model.predict(test_generator)
     y_pred = Yscaler.inverse_transform(y_pred_scaled)
-    results = pd.DataFrame({'y_true':test[y_col].values[n_input:], 'y_pred': y_pred.ravel()})
+    results = pd.DataFrame({'y_true': test[y_col].values[N_INPUT:], 'y_pred': y_pred.ravel()})
 
+    plt.figure(figsize=(14, 5))
     results.plot()
-    plt.savefig('figures/time_series_predictions.png')
+    time_series_img = plt.savefig('figures/time_series_predictions.png')
+    experiment.log_figure(time_series_img)
     # plt.show()
 
 
