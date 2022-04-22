@@ -78,6 +78,7 @@ def accuracy(output, target):
 
     return acc
 
+
 def pre_train():
     df = pd.read_csv(
         TRAINING_DATA_FILE,
@@ -86,8 +87,8 @@ def pre_train():
     data_training = df[df['Date'] < TRAIN_SPLIT_DATE_STRING].copy()
     data_test = df[df['Date'] >= TRAIN_SPLIT_DATE_STRING].copy()
 
-    training_data = data_training.drop(['Date', 'Adj Close'], axis=1)
-    test_data = data_test.drop(['Date', 'Adj Close'], axis=1)
+    training_data = data_training.drop(['Date'], axis=1)
+    test_data = data_test.drop(['Date'], axis=1)
 
     scaler = MinMaxScaler()
     training_data = scaler.fit_transform(training_data)
@@ -107,7 +108,7 @@ def pre_train():
     past_training_days = data_training.tail(hyper_params['lagging_days'])
     df = past_training_days.append(data_test, ignore_index=True)
 
-    df = df.drop(['Date', 'Adj Close'], axis=1)
+    df = df.drop(['Date'], axis=1)
     inputs = scaler.transform(df)
 
     X_test = []
@@ -122,6 +123,7 @@ def pre_train():
     y_test = torch.from_numpy(y_test).float()
 
     return X_train, y_train, X_test, y_test
+
 
 def train(epoch, X_train, y_train, model, optimizer, criterion):
     iter_time = AverageMeter()
@@ -160,6 +162,7 @@ def train(epoch, X_train, y_train, model, optimizer, criterion):
             
     return losses, acc
 
+
 def validate(epoch, X_test, y_test, model, criterion):
     iter_time = AverageMeter()
     losses = AverageMeter()
@@ -190,6 +193,7 @@ def validate(epoch, X_test, y_test, model, criterion):
                   .format(epoch, idx, len(list(zip(X_test, y_test))), iter_time=iter_time, loss=losses, top1=acc))
 
     return losses, acc
+
 
 def main():
     experiment = Experiment(

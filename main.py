@@ -2,7 +2,7 @@
 from get_data_scripts.reddit_data import get_post_statistics
 from scripts.training_join import aggregate_sentiment_scores
 from get_data_scripts.yahoo_finance_data import get_daily_stock_prices
-from models.rnn import train_model
+from  models.lstm_no_log import train_model
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -13,14 +13,15 @@ STOCKS = [
 ]
 NUM_POSTS = 500
 
+df = 'dataset/training_data.csv'
+
 
 def main():
     # get_post_statistics(subreddit=SUBREDDIT, stocks=STOCKS, num_posts=NUM_POSTS)
     # get_daily_stock_prices(stocks=STOCKS)
-    aggregate_sentiment_scores(subreddit=SUBREDDIT)
+    # aggregate_sentiment_scores(subreddit=SUBREDDIT)
     print(f"scraped stock data for: {STOCKS}, training model")
     train_model()
-    # models.train.main()
 
 
 if __name__ == "__main__":
