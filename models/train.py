@@ -78,6 +78,7 @@ def accuracy(output, target):
 
     return acc
 
+
 def pre_train():
     df = pd.read_csv(
         TRAINING_DATA_FILE,
@@ -123,6 +124,7 @@ def pre_train():
 
     return X_train, y_train, X_test, y_test
 
+
 def train(epoch, X_train, y_train, model, optimizer, criterion):
     iter_time = AverageMeter()
     losses = AverageMeter()
@@ -160,6 +162,7 @@ def train(epoch, X_train, y_train, model, optimizer, criterion):
             
     return losses, acc
 
+
 def validate(epoch, X_test, y_test, model, criterion):
     iter_time = AverageMeter()
     losses = AverageMeter()
@@ -190,6 +193,7 @@ def validate(epoch, X_test, y_test, model, criterion):
                   .format(epoch, idx, len(list(zip(X_test, y_test))), iter_time=iter_time, loss=losses, top1=acc))
 
     return losses, acc
+
 
 def main():
     experiment = Experiment(

@@ -1,6 +1,4 @@
 import os
-from comet_ml import Experiment
-
 import pandas as pd
 import numpy as np
 import keras
@@ -16,32 +14,14 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-# connect to comet to record experiments
-load_dotenv()
-experiment = Experiment(
-    api_key=os.getenv('comet_api_key'),
-    project_name=os.getenv('comet_project_name'),
-    workspace=os.getenv('comet_workspace'),
-)
-
 """Global variables"""
 EPOCHS = 10
 N_INPUT = 30  # trailing trading day count
 BATCH_SIZE = 32
 TEST_SIZE = 0.05
-FILENAME = 'dataset/training_data.csv'
+# FILENAME = 'dataset/training_data.csv'
+FILENAME = 'dataset/training_data_all_comments.csv'
 # FILENAME = 'dataset/daily_stock_price_data.csv'
-
-hyperparams = {
-    FILENAME,
-    EPOCHS,
-    N_INPUT,
-    BATCH_SIZE,
-}
-
-# log hyperparameters
-experiment.log_parameter("hyperparameters", hyperparams)
-print("connection succesful")
 
 # read in data
 df = pd.read_csv(FILENAME)
@@ -106,7 +86,6 @@ def show_raw_visualization(data):
         ax.legend([titles[i]])
     plt.tight_layout()
     periodicity = plt.savefig('figures/periodicity_sentiment_price_data.png')
-    experiment.log_figure(periodicity)
     plt.show()
     plt.close()
 
@@ -121,7 +100,6 @@ def show_heatmap(data):
     cb.ax.tick_params(labelsize=14)
     plt.title("Feature Correlation Heatmap", fontsize=14)
     heatmap = plt.savefig('figures/correlation_heatmap.png')
-    experiment.log_figure(heatmap)
     plt.show()
     plt.close()
 
@@ -223,14 +201,12 @@ def time_series_prediction(df):
     plot_df.plot()
     plt.xlabel('epoch')
     plt.ylabel('loss')
-    loss_curve = plt.savefig('figures/loss_curve.png')
-    experiment.log_figure(loss_curve)
+    plt.savefig('figures/loss_curve.png')
     plt.show()
     plt.close()
 
     results.plot()
-    time_series_pred = plt.savefig('figures/time_series_predictions.png')
-    experiment.log_figure(time_series_pred)
+    plt.savefig('figures/time_series_predictions.png')
     plt.show()
     plt.close()
 
