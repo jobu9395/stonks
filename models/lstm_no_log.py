@@ -19,7 +19,8 @@ EPOCHS = 10
 N_INPUT = 30  # trailing trading day count
 BATCH_SIZE = 32
 TEST_SIZE = 0.05
-FILENAME = 'dataset/training_data.csv'
+# FILENAME = 'dataset/training_data.csv'
+FILENAME = 'dataset/training_data_all_comments.csv'
 # FILENAME = 'dataset/daily_stock_price_data.csv'
 
 # read in data
