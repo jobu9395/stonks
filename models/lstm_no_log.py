@@ -19,8 +19,8 @@ EPOCHS = 10
 N_INPUT = 30  # trailing trading day count
 BATCH_SIZE = 32
 TEST_SIZE = 0.05
-# FILENAME = 'dataset/training_data.csv'
-FILENAME = 'dataset/training_data_all_comments.csv'
+FILENAME = 'dataset/training_data.csv'
+# FILENAME = 'dataset/training_data_all_comments.csv'
 # FILENAME = 'dataset/daily_stock_price_data.csv'
 
 # read in data
@@ -86,7 +86,7 @@ def show_raw_visualization(data):
         ax.legend([titles[i]])
     plt.tight_layout()
     periodicity = plt.savefig('figures/periodicity_sentiment_price_data.png')
-    plt.show()
+    # plt.show()
     plt.close()
 
 
@@ -100,7 +100,7 @@ def show_heatmap(data):
     cb.ax.tick_params(labelsize=14)
     plt.title("Feature Correlation Heatmap", fontsize=14)
     heatmap = plt.savefig('figures/correlation_heatmap.png')
-    plt.show()
+    # plt.show()
     plt.close()
 
 
@@ -137,35 +137,36 @@ def time_series_prediction(df):
 
     model = Sequential(
         [
-            LSTM(
-                units=50,
-                activation='relu',
-                return_sequences=True,
-                input_shape=(N_INPUT, n_features)
-            ),
-            Dropout(0.1),
-            LSTM(
-                units=60,
-                activation='relu',
-                return_sequences=True,
-            ),
-            Dropout(0.09),
-            LSTM(
-                units=70,
-                activation='relu',
-                return_sequences=True,
-            ),
-            Dropout(0.08),
-            LSTM(
-                units=80,
-                activation='relu',
-            ),
-            Dropout(0.07),
-            Dense(
-                units=1
-            )
+            LSTM(units=150, activation='relu', input_shape=(N_INPUT, n_features)),
+            Dense(units=1)
         ]
     )
+
+    # model = Sequential(
+    #     [
+    #         LSTM(
+    #             units=150,
+    #             activation='relu',
+    #             return_sequences=True,
+    #             input_shape=(N_INPUT, n_features)
+    #         ),
+    #         Dropout(0.1),
+    #         LSTM(
+    #             units=100,
+    #             activation='relu',
+    #             return_sequences=True,
+    #         ),
+    #         Dropout(0.1),
+    #         LSTM(
+    #             units=50,
+    #             activation='relu',
+    #         ),
+    #         Dropout(0.1),
+    #         Dense(
+    #             units=1
+    #         )
+    #     ]
+    # )
 
     print(model.summary())
 
@@ -202,12 +203,12 @@ def time_series_prediction(df):
     plt.xlabel('epoch')
     plt.ylabel('loss')
     plt.savefig('figures/loss_curve.png')
-    plt.show()
+    # plt.show()
     plt.close()
 
     results.plot()
     plt.savefig('figures/time_series_predictions.png')
-    plt.show()
+    # plt.show()
     plt.close()
 
 

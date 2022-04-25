@@ -18,7 +18,7 @@ OPTION = 'all_comments_granularity'
 
 
 def main():
-    # get_post_statistics(subreddit=SUBREDDIT, stocks=STOCKS, num_posts=NUM_POSTS)
+    get_post_statistics(subreddit=SUBREDDIT, stocks=STOCKS, num_posts=NUM_POSTS)
     get_daily_stock_prices(stocks=STOCKS)
     print(f"Scraped daily stock data for the following stock: {STOCKS}.")
     aggregate_sentiment_scores(subreddit=SUBREDDIT, option=OPTION)

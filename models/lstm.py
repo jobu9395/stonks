@@ -160,29 +160,23 @@ def time_series_prediction(df):
     model = Sequential(
         [
             LSTM(
-                units=50,
+                units=150,
                 activation='relu',
                 return_sequences=True,
                 input_shape=(N_INPUT, n_features)
             ),
             Dropout(0.1),
             LSTM(
-                units=60,
+                units=100,
                 activation='relu',
                 return_sequences=True,
             ),
-            Dropout(0.09),
+            Dropout(0.1),
             LSTM(
-                units=70,
-                activation='relu',
-                return_sequences=True,
-            ),
-            Dropout(0.08),
-            LSTM(
-                units=80,
+                units=50,
                 activation='relu',
             ),
-            Dropout(0.07),
+            Dropout(0.1),
             Dense(
                 units=1
             )
