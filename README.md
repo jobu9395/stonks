@@ -1,6 +1,8 @@
 # stonks
 
-For more information related to our experiment methodology, please see the PDF report at the root.
+This repo enables data mining of Reddit and Yahoo Finance to try and use comment sentiment and dense word embeddings of comments to train a long short term memory neural network to predict next day price movement, using trailing 30 day's of data.  It's set up to train on 95% of historical data and test on the trailing 5% of most recent data.
+
+For more information related to our experiment methodology, please see the PDF report at the root.  We experimented with three different model architectures on 4 different subsets of data. 
  
 To run this code, clone the repo and start by creating a `.env` folder at the root of the project.
  
