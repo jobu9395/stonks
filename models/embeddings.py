@@ -51,17 +51,9 @@ date_time_key = "Date"
 
 
 ################################################
-def create_embeddings(data):
-    train_ds = tf.data.Dataset.from_tensor_slices(data)
-    vectorize_layer = TextVectorization(
-        max_tokens=5000,
-        output_mode='int',
-        output_sequence_length=100
-    )
-    vectorize_layer.adapt(train_ds.batch(64))
-
+def create_embeddings(layer, data):
     embed_model = Sequential([
-        vectorize_layer,
+        layer,
         Embedding(5000, 150, input_length=N_INPUT),
         Flatten()
     ])
@@ -88,11 +80,17 @@ def time_series_prediction(df):
 
     train_ds_np = X_train['comment_body'].astype(str).to_numpy(dtype='str')
     X_train = train_ds_np
-    X_train = create_embeddings(X_train)
+    train_ds = tf.data.Dataset.from_tensor_slices(train_ds_np)
+    vectorize_layer = TextVectorization(
+        max_tokens=5000,
+        output_mode='int',
+        output_sequence_length=100
+    )
+    vectorize_layer.adapt(train_ds.batch(64))
+    X_train = create_embeddings(vectorize_layer, X_train)
     print(X_train.shape, y_train.shape)
-    
+
     n_features= X_train.shape[1] # how many predictors/Xs/features we have to predict y
-    b_size = 32 # Number of timeseries samples in each batch
     generator = TimeseriesGenerator(
         X_train,
         y_train,
@@ -102,6 +100,7 @@ def time_series_prediction(df):
     print(generator)
     X_test = test.drop(y_col,axis=1).copy()
     X_test = X_test['comment_body'].astype(str).to_numpy(dtype='str')
+    X_test = create_embeddings(vectorize_layer, X_test)
     
     test_generator = TimeseriesGenerator(
         X_test,
@@ -125,23 +124,23 @@ def time_series_prediction(df):
         input_shape=(N_INPUT, n_features), 
         return_sequences=True)
     )
-    model.add(Dropout(0.2)),
+    model.add(Dropout(0.09)),
     model.add(LSTM(
         units=50, 
         activation='relu', 
         input_shape=(N_INPUT, n_features), 
         return_sequences=True)
     )
-    model.add(Dropout(0.3)),
+    model.add(Dropout(0.08)),
     model.add(LSTM(
         units=50, 
         activation='relu', 
         input_shape=(N_INPUT, n_features), 
         return_sequences=False)
     )
-    model.add(Dropout(0.4)),
+    model.add(Dropout(0.07)),
     # model.add(GlobalMaxPool1D())
-    model.add(Dense(1, activity_regularizer=regularizer))
+    model.add(Dense(1))
     model.compile(optimizer=Adam(learning_rate=LEARNING_RATE), loss='mse')
     print(model.summary())
 
