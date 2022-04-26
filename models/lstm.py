@@ -107,7 +107,7 @@ def show_raw_visualization(data):
     plt.tight_layout()
     periodicity = plt.savefig('figures/periodicity_sentiment_price_data.png')
     experiment.log_figure(periodicity)
-    plt.show()
+    # plt.show()
     plt.close()
 
 
@@ -122,7 +122,7 @@ def show_heatmap(data):
     plt.title("Feature Correlation Heatmap", fontsize=14)
     heatmap = plt.savefig('figures/correlation_heatmap.png')
     experiment.log_figure(heatmap)
-    plt.show()
+    # plt.show()
     plt.close()
 
 
@@ -219,7 +219,7 @@ def time_series_prediction(df):
     plt.ylabel('loss')
     loss_curve = plt.savefig('figures/loss_curve.png')
     experiment.log_figure(loss_curve)
-    plt.show()
+    # plt.show()
     plt.close()
 
     results.plot()

@@ -16,3 +16,4 @@ dependencies:
   - tensorflow
   - pip:
       - sklearn
+      - comet_ml

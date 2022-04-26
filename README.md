@@ -4,9 +4,9 @@ This repo enables data mining of Reddit and Yahoo Finance, enbabling comment sen
 
 For more information related to our experiment methodology, please see the PDF report at the root.  We experimented with three different model architectures on 4 different subsets of data. 
  
-To run this code, clone the repo and start by creating a `.env` folder at the root of the project.
+To run this code, clone the repo and start by creating a `.env` folder at the root of the project.  This project requires `pip` and `conda` to be installed in order to run correctly.
  
-You'll need to put in your reddit specific PRAW credentials using the following format, as well as comet_ml credentials if you want to log your experiments.  If you want to log your experiments, `lstm.py` is set up to log.  If you don't want to log your experiments, run `lstm_no_log.py`:
+You'll need to put in your reddit specific PRAW credentials using the following format, as well as comet_ml credentials if you want to log your experiments.  If you want to log your experiments, `lstm.py` is set up to log.  If you don't want to log your experiments, run `lstm_no_log.py`.  You'll need to comment out the version you are not using in `main.py`.  `main.py` will call `train_model()` from whichever is not commented out in the import statements:
  
  ```text
 client_id=<your-client-id>
@@ -29,8 +29,6 @@ To update env after adding new source/dependencies:
 ```shell script
 conda env update -f environment.yaml
 ```
-
-Note: `comet_ml` is not a required package in the conda env, and must be installed with an additional step of `pip install comet_ml` once the conda env is created and activated.  Type `conda list` to ensure `comet_ml` is installed in your conda env after running this step.
 
 Once you have activated your conda virtual environment on your machine, at the project root, generate datasets locally, run the following:
 ```shell script

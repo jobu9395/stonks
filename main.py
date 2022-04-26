@@ -3,6 +3,7 @@ from get_data_scripts.reddit_data import get_post_statistics
 from scripts.training_join import aggregate_sentiment_scores
 from get_data_scripts.yahoo_finance_data import get_daily_stock_prices
 from models.lstm_no_log import train_model
+# from models.lstm import train_model
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -13,8 +14,8 @@ STOCKS = [
 NUM_POSTS = 500
 
 # join option can be either 'trading_day_granularity' or 'all_comments_granularity'
-# OPTION = 'trading_day_granularity'
-OPTION = 'all_comments_granularity'
+OPTION = 'trading_day_granularity'
+# OPTION = 'all_comments_granularity'
 
 
 def main():
