@@ -1,6 +1,6 @@
 # stonks
 
-This repo enables data mining of Reddit and Yahoo Finance to try and use comment sentiment and dense word embeddings of comments to train a long short term memory neural network to predict next day price movement, using trailing 30 day's of data.  It's set up to train on 95% of historical data and test on the trailing 5% of most recent data.
+This repo enables data mining of Reddit and Yahoo Finance, enbabling comment sentiment, historical price metadata, and dense word embeddings of comments to train a long short term memory neural network to predict next day price movement, using trailing 30 day's of data.  It's set up to train on 95% of historical data and test on the trailing 5% of most recent data.
 
 For more information related to our experiment methodology, please see the PDF report at the root.  We experimented with three different model architectures on 4 different subsets of data. 
  
@@ -29,6 +29,8 @@ To update env after adding new source/dependencies:
 ```shell script
 conda env update -f environment.yaml
 ```
+
+Note: `comet_ml` is not a required package in the conda env, and must be installed with an additional step of `pip install comet_ml` once the conda env is created and activated.  Type `conda list` to ensure `comet_ml` is installed in your conda env after running this step.
 
 Once you have activated your conda virtual environment on your machine, at the project root, generate datasets locally, run the following:
 ```shell script
